@@ -1,30 +1,23 @@
 import cv2
+from util import get_limits
+# This script captures video from the webcam and detects a specific color (yellow in this case) in real-time.
+
+
+yellow = [0, 255, 255]  # BGR color for yellow
 cap = cv2.VideoCapture(0)
 
 while True:
     ret, frame = cap.read()
 
-    cv2.imshow("Webcam", frame)
+    hsvImage = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+    lowerLimit, upperLimit = get_limits(yellow) # get lower and upper limits for yellow color detection
+    mask = cv2.inRange(hsvImage, lowerLimit, upperLimit) # create a mask for yellow color. A mask is a binary image where the detected color regions are white and the rest is black.
+
+    cv2.imshow("Webcam", mask)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
 cap.release()
 cv2.destroyAllWindows()
-
-#how to create docker container for this project
-#1. create a file named Dockerfile in the project directory
-#2. add the following lines to the Dockerfile
-#FROM python:3.8-slim
-#WORKDIR /app
-#COPY . /app
-#RUN pip install opencv-python numpy
-#CMD ["python", "main.py"]
-#3. build the docker image using the command: docker build -t color-detection .
-#4. run the docker container using the command: docker run -it --rm --name
-# to exclude virtual environment files from the docker image, create a .dockerignore file
-# and add the following lines to it:
-#.venv
-#__pycache__/
-#for readme file
-#to create a requirements.txt file, run the command: pip freeze > requirements.txt
